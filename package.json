@@ -1,0 +1,12 @@
+{
+  "name": "rh",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node run.js"
+  },
+  "dependencies": {
+    "jest": "^23.6.0"
+  }
+}
