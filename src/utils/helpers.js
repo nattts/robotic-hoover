@@ -33,14 +33,13 @@ const stopInterval = async (intrvl,coords,removedSpots) => {
 
 /**
 * @function { nextMove } 
-* @param { Object } driveDirs
-* @param { Object } hooverCoords
+* @param { Object } coords
 
-* driveDirs parameter gets copied to keep it immutable.
-* driveCopy[0] accessing the first 
+* coords.drive[0] accessing the first 
 * function in the drive directions, calls it with the current 
 * hoover coordinates, saves it to 'nextStep' variable.
-* then first index of gets removed from drive directions array.
+* then first index of gets removed from drive directions array, 
+* then hoover coordinates get updated
 * 
 */
 
