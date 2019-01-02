@@ -108,7 +108,8 @@ const findSpotIndex = (hooverPos,spotsArr)=> {
 /*
 * @function cleanSpot 
 * @param {object} coords 
-* @param {spots} Array of objects
+* @param {coords.spots} Array of objects
+* @param {coords.hoover} Object
 *
 * removes spot by deleting an object of spot position 
 * if it match hoover position
