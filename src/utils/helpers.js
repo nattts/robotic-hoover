@@ -1,15 +1,19 @@
-const createMatrix = (row,col) => [...Array(row)].map(row=>Array(col).fill([]));
+const createMatrix = (row,col) => [...Array(row)].map(row => Array(col).fill([]));
 
 const getSpotPositions = data => data.slice(2, data.length-1);
 
-const getConstantPositions = (data, spotPos) => {
- let constants = data;
- constants.splice(2,spotPos.length+1, constants[constants.length-1]);
- return constants;
+const getConstantPositions = data => {
+
+ let constants = [...data];
+ return constants.filter((x)=>
+  constants.indexOf(x) === 0 || 
+  constants.indexOf(x) === 1 || 
+  constants.indexOf(x) === constants.length-1);
+
 };
 
 //maps values to the keys
-const mapper = (spotspos,constants) => ({
+const toMap = (spotspos,constants) => ({
  room:constants[0],
  hoover:constants[1],
  spots:spotspos,
@@ -19,25 +23,33 @@ const mapper = (spotspos,constants) => ({
 //enumerates data with x and y keys 
 const toEnumerate = element => ( {x:element[0],y:element[1]} );
 
+const stopInterval = async (intrvl,coords,removedSpots) => {
+ await clearInterval(intrvl);
+ console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
+ console.log(`spots cleaned: ${removedSpots}`);
+ return coords;
 
-const stopInterval = async intrvl => await clearInterval(intrvl);
+};
 
 /**
 * @function { nextMove } 
-* @param { Object } coords
+* @param { Object } driveDirs
 * @param { Object } hooverCoords
 
-* coords.drive[0] accessing the first 
-* function in the coords.drive currentSpots, calls it with the current 
-* hoover coordinates, saves it to 'nxt' variable.
-* then coords.drive[0] gets removed from currentSpots.
+* driveDirs parameter gets copied to keep it immutable.
+* driveCopy[0] accessing the first 
+* function in the drive directions, calls it with the current 
+* hoover coordinates, saves it to 'nextStep' variable.
+* then first index of gets removed from drive directions array.
 * 
 */
-const nextMove = async (coords,hooverCoords) => {
+
+const nextMove = async (coords) => {
  try{
-  let nxt = coords.drive[0](hooverCoords);
+  const nextStep = coords.drive[0](coords.hoover);
   coords.drive.shift();
-  return nxt;
+  coords.hoover = nextStep;
+  return coords;
  }
  catch(e){ throw new Error('error in next move', e);}
 };
@@ -49,22 +61,26 @@ const isAnySpotLeft = async(coords) => {
  catch(e){ throw new Error('error in any spot left', e);}
 };
 
-const isOverlap = async (hooverPos,spots) => {
+
+const isOverlap = async (coords) => {
  try{
-  return spots.some((x) => {
-   return JSON.stringify(hooverPos) === JSON.stringify(x);
+  return coords.spots.some((x) => {
+   return JSON.stringify(coords.hoover) === JSON.stringify(x);
   });
  }
  catch(e){ throw new Error('error in overlaping', e);}
 };
 
-const placeElement = async (grid,element,x,y) => {
+
+const placeElement = async (grid,element,coords) => {
  try{
   if(element === 'hoover'){
+   const {x,y} = {x:coords.hoover.x, y:coords.hoover.y}; 
    grid[y][x] = 11;
    return grid;
   }
   if(element === 'spot'){
+   const {x,y} = {x:coords.x, y:coords.y};
    grid[y][x] = 33;
    return grid;
   }
@@ -72,19 +88,38 @@ const placeElement = async (grid,element,x,y) => {
  catch(e) {throw new Error('error placing element', e);}
 };
 
-const spotGenerator = async (board,coords,fn) => {
+const spotGenerator = async (board,c,fn) => {
  try{
+  const coords = [...c.spots];
   if(!coords){ throw new Error('missing coordinates');}
-  coords.map(async (coord) => await fn(board,'spot',coord.x, coord.y));
+  return coords.map(async (coord) => await fn(board,'spot',coord));
  }
  catch(e){ throw new Error('error in spot generator', e);}
 };
 
-const cleanSpot = async(hooverPos,spots) => {
+const findSpotIndex = (hooverPos,spotsArr)=> {
+ const index = spotsArr.findIndex((element) => {
+  return JSON.stringify(element) ===  JSON.stringify(hooverPos);
+ });
+ return index;
+
+};
+
+
+/*
+* @function cleanSpot 
+* @param {object} coords 
+* @param {spots} Array of objects
+*
+* removes spot by deleting an object of spot position 
+* if it match hoover position
+*/
+
+const cleanSpot = async(coords) => {
  try{
-  //array of objects {removed}
-  let removed = spots.splice( spots.indexOf(hooverPos), 1 );
-  return removed;
+  let index = findSpotIndex(coords.hoover,coords.spots);
+  coords.spots.splice(index,1);
+  return coords.spots;
  }
  catch(e){ throw new Error('error in cleaning', e);}
 };
@@ -94,7 +129,7 @@ module.exports = {
  getSpotPositions,
  getConstantPositions,
  toEnumerate,
- mapper,
+ toMap,
  stopInterval,
  nextMove,
  isAnySpotLeft,

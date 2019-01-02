@@ -1,10 +1,12 @@
 {
-  "name": "rh",
+  "name"   : "robotic-hoover",
   "version": "1.0.0",
-  "main": "index.js",
+  "main"   : "run.js",
   "license": "MIT",
   "scripts": {
-    "start": "node run.js"
+    "start": "node run.js",
+    "test" : "jest",
+    "watch": "jest --watch *.js"
   },
   "dependencies": {
     "jest": "^23.6.0"

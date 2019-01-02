@@ -16,75 +16,66 @@ const fs = require('fs');
 
 const readFile = promisify(fs.readFile);
 
-
 const fileReader = async file => {
  try{
-  let content = await readFile(file, 'utf8');
+  const content = await readFile(file, 'utf8');
   if (!content) { throw new Error('no content');}
   return content;
  }
- catch(e) { throw new Error('error with filereader', e);}
+ catch(e) { throw new Error('error with filereader');}
 };
 
-const getData = async(file,filereader,processor) => {
+const getData = async(file,filereader) => {
  try{
-  let data = await filereader(file);
-  let processed = await processor(data);
-  return processed;
+  return await filereader(file);
  }
- catch(e){ throw new Error('error with getting data',e);}
+ catch(e){ throw new Error('error with getting data');}
 };
 
 const inputProcessor = async data => {
  try{
   if(!data){ throw new Error('data lost');}
-  let parsed = stringParser(data);
-  let mapped = objectMapper(parsed);
-  return mapped;
+  const parsed = stringParser(data);
+  return objectMapper(parsed);
  }
- catch(e) { throw new Error('error with processor', e);} 
+ catch(e) { throw new Error('error with processor');} 
+ 
 };
-
 
 /**
 * @function { show } 
-*
-* @param { Object } coords
-* @param { Number } hooverX, hooverY
 * @function {isAnySpotsLeft} @param { Array } spotsCoords
 */
 
-const show = async (coords, hooverX, hooverY) => {
+const show = async (coords) => {
  try{
+  //clearing the console
   console.log('\x1Bc');
 
-  let spotsCoords = coords.spots;
-  let { x:roomX, y:roomY } = coords.room;
+  const matrix = createMatrix(coords.room.x,coords.room.y);
+  const spots = await spotGenerator(matrix,coords,placeElement);
+  const board = await placeElement(matrix,'hoover',coords);
 
-  let matrix = createMatrix(roomX,roomY);
-
-  let spots = await spotGenerator(matrix,spotsCoords,placeElement);
-
-  let board = await placeElement(matrix,'hoover',hooverX,hooverY);
- 
-  if (await isOverlap({x:hooverX, y:hooverY},spotsCoords)) {
-   let removed = await cleanSpot({x:hooverX, y:hooverY},spotsCoords);
+  if (await isOverlap(coords)) {
+   const spotsLeft = await cleanSpot(coords);
+   coords.spots = [...spotsLeft];
    store.setRemovedSpots();
   }
-  let reverseBoard = board.reverse();
+  
+  const reverseBoard = board.reverse();
   console.log(reverseBoard);
 
-  if (await isAnySpotLeft(spotsCoords)) {
-   let interval = store.getInterval();
-   await stopInterval(interval);
-   console.log(`hoover position:  ${hooverX} ${hooverY}`);
-   console.log(`spots cleaned: ${store.getRemovedSpots()}`);
-   return ({ x:hooverX, y:hooverY });
+
+  if (await isAnySpotLeft(coords.spots)) {
+   const interval = store.getInterval();
+   const removedSpots = store.getRemovedSpots();
+   return await stopInterval(interval,coords,removedSpots);
   }
   
-  return await nextMove(coords,{ x:hooverX, y:hooverY });
- 
- } catch(e){ console.log('error with render ', e);}
+  return await nextMove(coords);
+
+ } 
+ catch(e){ console.log('error with render ', e);}
 };
 
 module.exports = { 

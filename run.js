@@ -5,29 +5,37 @@ const {
  fileReader,
  spotGenerator,
  show
-} = require('./src/base.js');
+} = require('./src/base');
 
-const { store } = require('./src/store.js');
+const { validator } = require('./src/validator/inputValidator');
+const { store } = require('./src/store');
 
+
+/**
+* @function { render } 
+* @param { Object } coords
+* 
+* @const {result} of each interval used to update 
+* existing coordinates.
+*
+*/
 
 const render = async(coords) => {
 
- let { x:hooverX, y:hooverY } = coords.hoover; 
- 
  const interval = setInterval(async()=> {
-  let res = await show(coords,hooverX,hooverY);
-  ({ x: hooverX, y: hooverY} = res);
- 
+  const result = await show(coords);
+  coords = {...result};
+
  }, 800);
  
  store.setInterval(interval);
 
 };
 
-
-
-getData('input.txt', fileReader, inputProcessor)
- .then((res)=> render(res))
+getData('input.txt', fileReader)
+ .then(validator)
+ .then(inputProcessor)
+ .then((result)=> render(result))
  .catch((e) => console.log(new Error(e))); 
 
 module.exports = { store };
