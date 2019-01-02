@@ -44,7 +44,7 @@ const inputProcessor = async data => {
 
 /**
 * @function { show } 
-* @function {isAnySpotsLeft} @param { Array } spotsCoords
+* @const {reverseboard} to make starting point of x:0, y:0 be in the bottom left corner
 */
 
 const show = async (coords) => {
