@@ -6,7 +6,11 @@ const {
  isOverlap,
  placeElement,
  spotGenerator,
- cleanSpot } = require('./utils/helpers');
+ cleanSpot,
+ isAnyDirectionLeft,
+ stop,
+ isOutOfBound,
+ stepBack } = require('./utils/helpers');
 
 const { stringParser } = require('./parser/stringParser');
 const { objectMapper } = require('./mapper/mapper');
@@ -47,10 +51,10 @@ const inputProcessor = async data => {
 * @function {isAnySpotsLeft} @param { Array } spotsCoords
 */
 
-const show = async (coords) => {
+const show = async coords => {
  try{
   //clearing the console
-  console.log('\x1Bc');
+  //console.log('\x1Bc');
 
   const matrix = createMatrix(coords.room.x,coords.room.y);
   const spots = await spotGenerator(matrix,coords,placeElement);
@@ -61,19 +65,32 @@ const show = async (coords) => {
    coords.spots = [...spotsLeft];
    store.setRemovedSpots();
   }
+
   
+
   const reverseBoard = board.reverse();
   console.log(reverseBoard);
 
-
   if (await isAnySpotLeft(coords.spots)) {
-   const interval = store.getInterval();
-   const removedSpots = store.getRemovedSpots();
-   return await stopInterval(interval,coords,removedSpots);
+   return await stop(store, coords, stopInterval); 
   }
   
-  return await nextMove(coords);
+  if(await isAnyDirectionLeft(coords.drive)) {
+   return await stop(store, coords, stopInterval); 
+  }
+ 
+  
+debugger
+  const nxt = await nextMove(coords);
+  if(await isOutOfBound(nxt)){
+   console.log('out');
 
+   
+   return coords;
+  }
+
+  return nxt;
+ debugger
  } 
  catch(e){ console.log('error with render ', e);}
 };

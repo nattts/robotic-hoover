@@ -35,6 +35,7 @@ const render = async(coords) => {
 getData('input.txt', fileReader)
  .then(validator)
  .then(inputProcessor)
+ //.then((result)=> console.log(result))
  .then((result)=> render(result))
  .catch((e) => console.log(new Error(e))); 
 

@@ -17,7 +17,7 @@ class Store{
   return this.interval;
  }
 
- setRemovedSpots(r){
+ setRemovedSpots(){
   this.removedSpots++;
  }
 
@@ -29,4 +29,7 @@ class Store{
 const store = new Store();
 
 module.exports = { store };
+
+
+
 
