@@ -48,12 +48,16 @@ const inputProcessor = async data => {
 
 /**
 * @function { show } 
+<<<<<<< HEAD
 * @const {board.reverse()} to make starting point of x:0, y:0 be in the bottom left corner.
 *
 * @member {nextStep} is immutable in orderto be able to use mutable
 * coordinates in case of hoover gets out of bounds.
 * @member {mutable} converting back to mutable to be able to update in the future.
 *
+=======
+* @const {reverseboard} to make starting point of x:0, y:0 be in the bottom left corner
+>>>>>>> 377df2bdfdafa43214e397d4c7f47bffaa54fd93
 */
 
 const show = async coords => {

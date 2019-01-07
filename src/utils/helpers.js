@@ -47,6 +47,7 @@ const stop = async(store, coords, callback) =>
 /**
 * @function { nextMove } 
 * @param { Object } coords
+<<<<<<< HEAD
 * @member {nextStep} coords.drive[0] accessing the first 
 * function in the drive directions, calls it with the current 
 * hoover coordinates, saves it to 'nextStep'.
@@ -55,6 +56,14 @@ const stop = async(store, coords, callback) =>
 * @member {drive} first index gets removed from drive directions array.
 * @member {filtered} filtering that out 'undefined' ad it took place 
 * after removing 1st index in drive. 
+=======
+
+* coords.drive[0] accessing the first 
+* function in the drive directions, calls it with the current 
+* hoover coordinates, saves it to 'nextStep' variable.
+* then first index of gets removed from drive directions array, 
+* then hoover coordinates get updated
+>>>>>>> 377df2bdfdafa43214e397d4c7f47bffaa54fd93
 * 
 * Then creating new object with updated hoover position and array 
 * with directions
