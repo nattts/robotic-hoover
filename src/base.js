@@ -9,12 +9,12 @@ const {
  cleanSpot,
  isAnyDirectionLeft,
  stop,
- isOutOfBound,
- stepBack } = require('./utils/helpers');
+ isOutOfBound } = require('./utils/helpers');
 
 const { stringParser } = require('./parser/stringParser');
 const { objectMapper } = require('./mapper/mapper');
 const { promisify } = require('util');
+const { fromJS, toJS } = require('immutable');
 const { store } = require('./store');
 const fs = require('fs');
 
@@ -48,13 +48,18 @@ const inputProcessor = async data => {
 
 /**
 * @function { show } 
-* @function {isAnySpotsLeft} @param { Array } spotsCoords
+* @const {board.reverse()} to make starting point of x:0, y:0 be in the bottom left corner.
+*
+* @member {nextStep} is immutable in orderto be able to use mutable
+* coordinates in case of hoover gets out of bounds.
+* @member {mutable} converting back to mutable to be able to update in the future.
+*
 */
 
 const show = async coords => {
  try{
   //clearing the console
-  //console.log('\x1Bc');
+  console.log('\x1Bc');
 
   const matrix = createMatrix(coords.room.x,coords.room.y);
   const spots = await spotGenerator(matrix,coords,placeElement);
@@ -66,10 +71,7 @@ const show = async coords => {
    store.setRemovedSpots();
   }
 
-  
-
-  const reverseBoard = board.reverse();
-  console.log(reverseBoard);
+  console.log(board.reverse());
 
   if (await isAnySpotLeft(coords.spots)) {
    return await stop(store, coords, stopInterval); 
@@ -79,18 +81,16 @@ const show = async coords => {
    return await stop(store, coords, stopInterval); 
   }
  
-  
-debugger
-  const nxt = await nextMove(coords);
-  if(await isOutOfBound(nxt)){
-   console.log('out');
+  const nextStep = await nextMove(coords);
+  const mutable = nextStep.toJS();
 
-   
+  if(await isOutOfBound(mutable)){
+   coords.drive = [...mutable.drive];
    return coords;
   }
+  
+  return mutable;
 
-  return nxt;
- debugger
  } 
  catch(e){ console.log('error with render ', e);}
 };

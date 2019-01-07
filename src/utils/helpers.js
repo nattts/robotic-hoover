@@ -1,13 +1,13 @@
 const { store } = require('../store');
+const { fromJS } = require('immutable'); 
 
 const createMatrix = (row,col) => [...Array(row)].map(row => Array(col).fill([]));
 
 const getSpotPositions = data => data.slice(2, data.length-1);
 
 const getConstantPositions = data => {
-
  let constants = [...data];
- return constants.filter((x)=>
+ return constants.filter((x) =>
   constants.indexOf(x) === 0 || 
   constants.indexOf(x) === 1 || 
   constants.indexOf(x) === constants.length-1);
@@ -28,7 +28,7 @@ const toEnumerate = element => ( {x:element[0],y:element[1]} );
 const stopInterval = async (intrvl,coords,removedSpots) => {
  await clearInterval(intrvl);
  console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
- console.log(`spots cleaned: ${removedSpots.length}`);
+ console.log(`spots cleaned: ${removedSpots}`);
  return coords;
 
 };
@@ -43,37 +43,44 @@ const isAnyDirectionLeft = async coords => {
 const stop = async(store, coords, callback) => 
  await callback(store.getInterval(),coords,store.getRemovedSpots());
 
-const stepBack = async (store,coords) => {
- let removedSpots = store.getRemovedSpots();
- let lastRemoved = removedSpots[removedSpots.length-1];
- return coords.hoover = lastRemoved;
-};
-
 
 /**
 * @function { nextMove } 
-* @param { Object } driveDirs
-* @param { Object } hooverCoords
-
-* driveDirs parameter gets copied to keep it immutable.
-* driveCopy[0] accessing the first 
+* @param { Object } coords
+* @member {nextStep} coords.drive[0] accessing the first 
 * function in the drive directions, calls it with the current 
-* hoover coordinates, saves it to 'nextStep' variable.
-* then first index of gets removed from drive directions array.
+* hoover coordinates, saves it to 'nextStep'.
 * 
+* @member {immutableCoords}, {nxt} adding immutablility.
+* @member {drive} first index gets removed from drive directions array.
+* @member {filtered} filtering that out 'undefined' ad it took place 
+* after removing 1st index in drive. 
+* 
+* Then creating new object with updated hoover position and array 
+* with directions
 */
 
 const nextMove = async coords => {
  try{
+
   const nextStep = coords.drive[0](coords.hoover);
-  //let removed = coords.drive.shift();
-  //store.setRemovedSpots(removed);
-  coords.drive.shift();
-  coords.hoover = nextStep;
-  return coords;
+
+  const immutableCoords = fromJS(coords);
+
+  const nxt = fromJS(nextStep);
+
+  const drive = immutableCoords.get('drive').shift();
+
+  const filtered = drive.filter((x)=> x != undefined);
+ 
+  return Object.assign(immutableCoords
+   .set('hoover',nxt)
+   .set('drive', filtered));
+ 
  }
  catch(e){ throw new Error('error in next move', e);}
 };
+
 
 const isAnySpotLeft = async coords => {
  try{
@@ -130,13 +137,14 @@ const findSpotIndex = (hooverPos,spotsArr)=> {
 /*
 * @function cleanSpot 
 * @param {object} coords 
-* @param {spots} Array of objects
+* @param {coords.spots} Array of objects
+* @param {coords.hoover} Object
 *
 * removes spot by deleting an object of spot position 
 * if it match hoover position
 */
 
-const cleanSpot = async coords  => {
+const cleanSpot = async coords => {
  try{
   let index = findSpotIndex(coords.hoover,coords.spots);
   coords.spots.splice(index,1);
@@ -145,14 +153,12 @@ const cleanSpot = async coords  => {
  catch(e){ throw new Error('error in cleaning', e);}
 };
 
-const isOutOfBound = async coords =>{
+const isOutOfBound = async coords => {
  const { x:roomX, y:roomY } = coords.room;
  const { x:hooverX, y: hooverY} = coords.hoover;
- if(hooverY > roomY-1 || hooverX > roomX-1 ){ 
-
+ if(hooverY > roomY-1 || hooverX > roomX-1 || hooverX < 0 || hooverY < 0 ){ 
   return true;
  }
- console.log('in');
  return false;
 };
 
@@ -172,6 +178,5 @@ module.exports = {
  cleanSpot,
  isAnyDirectionLeft,
  stop,
- isOutOfBound,
- stepBack
+ isOutOfBound
 };
