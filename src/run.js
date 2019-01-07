@@ -1,14 +1,7 @@
-const { 
- placeElement,
- getData,
- inputProcessor,
- fileReader,
- spotGenerator,
- show
-} = require('./src/base');
+import * as base from './base'
 
-const { validator } = require('./src/validator/inputValidator');
-const { store } = require('./src/store');
+const { validator } = require('./validator/inputValidator');
+const { store } = require('./store');
 
 /**
 * @function { render } 
@@ -22,7 +15,7 @@ const { store } = require('./src/store');
 const render = async(coords) => {
 
  const interval = setInterval(async()=> {
-  const result = await show(coords);
+  const result = await base.show(coords);
   coords = {...result};
 
  }, 800);
@@ -31,9 +24,10 @@ const render = async(coords) => {
 
 };
 
-getData('input.txt', fileReader)
- .then(validator)
- .then(inputProcessor)
+base.getData('input.txt', base.fileReader)
+ 
+ .then(base.validator)
+ .then(base.inputProcessor)
  .then((result)=> render(result))
  .catch((e) => console.log(new Error(e))); 
 

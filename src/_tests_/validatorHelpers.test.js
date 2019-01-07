@@ -5,7 +5,8 @@ const {
  removeLast,
  hasSpecificLetters,
  regexChecker
-} = require('./validatorHelpers');
+} = require('../utils/validatorHelpers');
+
 
 describe('checks if input has any leading, trailing or between lines spacing',() => {
  test('fails', () => {

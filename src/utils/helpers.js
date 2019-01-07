@@ -167,7 +167,6 @@ const isOutOfBound = async coords => {
  return false;
 };
 
-
 module.exports = { 
  createMatrix,
  getSpotPositions,

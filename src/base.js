@@ -1,15 +1,4 @@
-const { 
- createMatrix, 
- stopInterval, 
- nextMove,
- isAnySpotLeft, 
- isOverlap,
- placeElement,
- spotGenerator,
- cleanSpot,
- isAnyDirectionLeft,
- stop,
- isOutOfBound } = require('./utils/helpers');
+import * as utils from './utils/helpers';
 
 const { stringParser } = require('./parser/stringParser');
 const { objectMapper } = require('./mapper/mapper');
@@ -20,7 +9,7 @@ const fs = require('fs');
 
 const readFile = promisify(fs.readFile);
 
-const fileReader = async file => {
+export const fileReader = async file => {
  try{
   const content = await readFile(file, 'utf8');
   if (!content) { throw new Error('no content');}
@@ -29,14 +18,14 @@ const fileReader = async file => {
  catch(e) { throw new Error('error with filereader');}
 };
 
-const getData = async(file,filereader) => {
+export const getData = async(file,filereader) => {
  try{
   return await filereader(file);
  }
  catch(e){ throw new Error('error with getting data');}
 };
 
-const inputProcessor = async data => {
+export const inputProcessor = async data => {
  try{
   if(!data){ throw new Error('data lost');}
   const parsed = stringParser(data);
@@ -57,35 +46,35 @@ const inputProcessor = async data => {
 * @const {reverseboard} to make starting point of x:0, y:0 be in the bottom left corner
 */
 
-const show = async coords => {
+export const show = async coords => {
  try{
   //clearing the console
   console.log('\x1Bc');
 
-  const matrix = createMatrix(coords.room.x,coords.room.y);
-  const spots = await spotGenerator(matrix,coords,placeElement);
-  const board = await placeElement(matrix,'hoover',coords);
+  const matrix = utils.createMatrix(coords.room.x,coords.room.y);
+  const spots = await utils.spotGenerator(matrix,coords,utils.placeElement);
+  const board = await utils.placeElement(matrix,'hoover',coords);
 
-  if (await isOverlap(coords)) {
-   const spotsLeft = await cleanSpot(coords);
+  if (await utils.isOverlap(coords)) {
+   const spotsLeft = await utils.cleanSpot(coords);
    coords.spots = [...spotsLeft];
    store.setRemovedSpots();
   }
 
   console.log(board.reverse());
 
-  if (await isAnySpotLeft(coords.spots)) {
-   return await stop(store, coords, stopInterval); 
+  if (await utils.isAnySpotLeft(coords.spots)) {
+   return await utils.stop(store, coords, utils.stopInterval); 
   }
   
-  if(await isAnyDirectionLeft(coords.drive)) {
-   return await stop(store, coords, stopInterval); 
+  if(await utils.isAnyDirectionLeft(coords.drive)) {
+   return await utils.stop(store, coords, utils.stopInterval); 
   }
  
-  const nextStep = await nextMove(coords);
+  const nextStep = await utils.nextMove(coords);
   const mutable = nextStep.toJS();
 
-  if(await isOutOfBound(mutable)){
+  if(await utils.isOutOfBound(mutable)){
    coords.drive = [...mutable.drive];
    return coords;
   }
@@ -96,14 +85,7 @@ const show = async coords => {
  catch(e){ console.log('error with render ', e);}
 };
 
-module.exports = { 
- placeElement, 
- fileReader, 
- getData, 
- inputProcessor,
- spotGenerator,
- show
-};
+
 
 
 

@@ -10,7 +10,8 @@ const {
  isOverlap,
  placeElement,
  spotGenerator,
- cleanSpot } = require('./helpers');
+ cleanSpot } = require('../utils/helpers');
+
 
 describe('creates a grid', () => {
  test('creates a grid', () => {
