@@ -23,12 +23,17 @@ const render = async(coords) => {
 
 };
 
-base.getData('input.txt', base.fileReader)
- 
+const run = async () => {
+ try{
+  base.getData('input.txt', base.fileReader)
  .then(validator)
  .then(base.inputProcessor)
  .then((result)=> render(result))
  .catch((e) => console.log(new Error(e))); 
+}
+ catch(e){ console.log('error while runnning', e);}
+}
 
-module.exports = { store };
+
+module.exports = { store, run };
 

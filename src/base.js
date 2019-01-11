@@ -11,7 +11,6 @@ const base = {
 
  fileReader: async file => {
   try{
-   if (!file) { throw new Error('no file');}
    const readFile = promisify(fs.readFile);
    const content = await readFile(file, 'utf8');
    if (!content) { throw new Error('no content');}
@@ -22,7 +21,7 @@ const base = {
 
  getData: async(file,filereader) => {
   try{
-
+   if (!file) { throw new Error('no file');}
    return await filereader(file);
   }
   catch(e){ throw new Error('error with getting data');}
