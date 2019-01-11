@@ -1,50 +1,52 @@
 const { store } = require('../store');
 const { fromJS } = require('immutable'); 
 
-const createMatrix = (row,col) => [...Array(row)].map(row => Array(col).fill([]));
+const utils = {
 
-const getSpotPositions = data => data.slice(2, data.length-1);
+ createMatrix: async (row,col) => [...Array(row)].map(row => Array(col).fill([])),
 
-const getConstantPositions = data => {
- let constants = [...data];
- return constants.filter((x) =>
-  constants.indexOf(x) === 0 || 
-  constants.indexOf(x) === 1 || 
-  constants.indexOf(x) === constants.length-1);
+ getSpotPositions: data => data.slice(2, data.length-1),
 
-};
+ getConstantPositions: data => {
+  let constants = [...data];
+  return constants.filter((x) =>
+   constants.indexOf(x) === 0 || 
+   constants.indexOf(x) === 1 || 
+   constants.indexOf(x) === constants.length-1);
 
-//maps values to the keys
-const toMap = (spotspos,constants) => ({
- room:constants[0],
- hoover:constants[1],
- spots:spotspos,
- drive:constants[constants.length-1]
-});
+ },
+
+ //maps values to the keys
+ toMap : (spotspos,constants) => ({
+  room:constants[0],
+  hoover:constants[1],
+  spots:spotspos,
+  drive:constants[constants.length-1]
+ }),
  
-//enumerates data with x and y keys 
-const toEnumerate = element => ( {x:element[0],y:element[1]} );
+ //enumerates data with x and y keys 
+ toEnumerate: element => ( {x:element[0],y:element[1]} ),
 
-const stopInterval = async (intrvl,coords,removedSpots) => {
- await clearInterval(intrvl);
- console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
- console.log(`spots cleaned: ${removedSpots}`);
- return coords;
+ stopInterval: async (intrvl,coords,removedSpots) => {
+  await clearInterval(intrvl);
+  console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
+  console.log(`spots cleaned: ${removedSpots}`);
+  return coords;
 
-};
+ },
 
-const isAnyDirectionLeft = async coords => {
- try{
-  return coords.length === 0;
- }
- catch(e){ throw new Error('error in any direction left', e);}
-};
+ isAnyDirectionLeft: async coords => {
+  try{
+   return coords.length === 0;
+  }
+  catch(e){ throw new Error('error in any direction left', e);}
+ },
 
-const stop = async(store, coords, callback) => 
- await callback(store.getInterval(),coords,store.getRemovedSpots());
+ stop: async(store, coords, callback) => 
+  await callback(store.getInterval(),coords,store.getRemovedSpots()),
 
 
-/**
+ /**
 * @function { nextMove } 
 * @param { Object } coords
 * @member {nextStep} coords.drive[0] accessing the first 
@@ -65,81 +67,80 @@ const stop = async(store, coords, callback) =>
 * with directions
 */
 
-const nextMove = async coords => {
- try{
+ nextMove: async coords => {
+  try{
 
-  const nextStep = coords.drive[0](coords.hoover);
+   const nextStep = coords.drive[0](coords.hoover);
 
-  const immutableCoords = fromJS(coords);
+   const immutableCoords = fromJS(coords);
 
-  const nxt = fromJS(nextStep);
+   const nxt = fromJS(nextStep);
 
-  const drive = immutableCoords.get('drive').shift();
+   const drive = immutableCoords.get('drive').shift();
 
-  const filtered = drive.filter((x)=> x != undefined);
+   const filtered = drive.filter((x)=> x != undefined);
  
-  return Object.assign(immutableCoords
-   .set('hoover',nxt)
-   .set('drive', filtered));
+   return Object.assign(immutableCoords
+    .set('hoover',nxt)
+    .set('drive', filtered));
  
- }
- catch(e){ throw new Error('error in next move', e);}
-};
-
-
-const isAnySpotLeft = async coords => {
- try{
-  return coords.length === 0;
- }
- catch(e){ throw new Error('error in any spot left', e);}
-};
-
-
-const isOverlap = async coords => {
- try{
-  return coords.spots.some((x) => {
-   return JSON.stringify(coords.hoover) === JSON.stringify(x);
-  });
- }
- catch(e){ throw new Error('error in overlaping', e);}
-};
-
-
-const placeElement = async (grid,element,coords) => {
- try{
-  if(element === 'hoover'){
-   const {x,y} = {x:coords.hoover.x, y:coords.hoover.y}; 
-   grid[y][x] = 11;
-   return grid;
   }
-  if(element === 'spot'){
-   const {x,y} = {x:coords.x, y:coords.y};
-   grid[y][x] = 33;
-   return grid;
+  catch(e){ throw new Error('error in next move', e);}
+ },
+
+
+ isAnySpotLeft: async coords => {
+  try{
+   return coords.length === 0;
   }
- }
- catch(e) {throw new Error('error placing element', e);}
-};
+  catch(e){ throw new Error('error in any spot left', e);}
+ },
 
-const spotGenerator = async (board,c,fn) => {
- try{
-  const coords = [...c.spots];
-  if(!coords){ throw new Error('missing coordinates');}
-  return coords.map(async coord => await fn(board,'spot',coord));
- }
- catch(e){ throw new Error('error in spot generator', e);}
-};
-
-const findSpotIndex = (hooverPos,spotsArr)=> {
- const index = spotsArr.findIndex((element) => {
-  return JSON.stringify(element) ===  JSON.stringify(hooverPos);
- });
- return index;
-
-};
+ isOverlap: async coords => {
+  try{
+   return coords.spots.some((x) => {
+    return JSON.stringify(coords.hoover) === JSON.stringify(x);
+   });
+  }
+  catch(e){ throw new Error('error in overlaping', e);}
+ },
 
 
-/*
+ placeElement: async (grid,element,coords) => {
+  try{
+   if(element === 'hoover'){
+    const {x,y} = {x:coords.hoover.x, y:coords.hoover.y}; 
+    grid[y][x] = 11;
+    return grid;
+   }
+   if(element === 'spot'){
+    const {x,y} = {x:coords.x, y:coords.y};
+    grid[y][x] = 33;
+    return grid;
+   }
+  }
+  catch(e) {throw new Error('error placing element', e);}
+ },
+
+ spotGenerator: async (board,c,fn) => {
+  try{
+   const coords = [...c.spots];
+   if(!coords){ throw new Error('missing coordinates');}
+   return coords.map(async coord => await fn(board,'spot',coord));
+  }
+  catch(e){ throw new Error('error in spot generator', e);}
+ },
+
+ findSpotIndex: async (hooverPos,spotsArr) => {
+  try{
+   return spotsArr.findIndex((element) => {
+    return JSON.stringify(element) ===  JSON.stringify(hooverPos);
+   });
+  }
+  catch(e){ throw new Error('err', e);}
+ },
+
+ /*
 * @function cleanSpot 
 * @param {object} coords 
 * @param {coords.spots} Array of objects
@@ -149,38 +150,23 @@ const findSpotIndex = (hooverPos,spotsArr)=> {
 * if it match hoover position
 */
 
-const cleanSpot = async coords => {
- try{
-  let index = findSpotIndex(coords.hoover,coords.spots);
-  coords.spots.splice(index,1);
-  return coords.spots;
+ cleanSpot: async coords => {
+  try{
+   let index = await utils.findSpotIndex(coords.hoover,coords.spots);
+   coords.spots.splice(index,1);
+   return coords.spots;
+  }
+  catch(e){ throw new Error('error in cleaning', e);}
+ },
+
+ isOutOfBound: async coords => {
+  const { x:roomX, y:roomY } = coords.room;
+  const { x:hooverX, y: hooverY} = coords.hoover;
+  if(hooverY > roomY-1 || hooverX > roomX-1 || hooverX < 0 || hooverY < 0 ){ 
+   return true;
+  }
  }
- catch(e){ throw new Error('error in cleaning', e);}
+
 };
 
-const isOutOfBound = async coords => {
- const { x:roomX, y:roomY } = coords.room;
- const { x:hooverX, y: hooverY} = coords.hoover;
- if(hooverY > roomY-1 || hooverX > roomX-1 || hooverX < 0 || hooverY < 0 ){ 
-  return true;
- }
- return false;
-};
-
-module.exports = { 
- createMatrix,
- getSpotPositions,
- getConstantPositions,
- toEnumerate,
- toMap,
- stopInterval,
- nextMove,
- isAnySpotLeft,
- isOverlap,
- placeElement,
- spotGenerator,
- cleanSpot,
- isAnyDirectionLeft,
- stop,
- isOutOfBound
-};
+module.exports = { utils };

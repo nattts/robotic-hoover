@@ -1,16 +1,4 @@
-const { 
- createMatrix,
- getSpotPositions,
- getConstantPositions,
- toEnumerate,
- toMap,
- stopInterval,
- nextMove,
- isAnySpotLeft,
- isOverlap,
- placeElement,
- spotGenerator,
- cleanSpot } = require('../utils/helpers');
+const { utils } = require('../utils/helpers');
 
 
 describe('creates a grid', () => {
@@ -22,7 +10,7 @@ describe('creates a grid', () => {
    [ [], [], [] ], 
    [ [], [], [] ] 
   ];
-  expect(createMatrix(row, col)).toEqual(expected);
+  expect(utils.createMatrix(row, col)).toEqual(expected);
  });
  
 });
@@ -40,7 +28,7 @@ describe('returns array of any number of objects between the 2nd \
    [ [] ] ];
   
   let expected = [ { x: 1, y: 0 }, { x: 2, y: 2 }, { x: 2, y: 3 } ];
-  expect(getSpotPositions(actual)).toEqual(expected);
+  expect(utils.getSpotPositions(actual)).toEqual(expected);
  }); 
 
 });
@@ -60,7 +48,7 @@ describe('returns an array of objects of\
  
   let expected = [{ x: 5, y: 5 },{ x: 1, y: 2 },[ [] ] ];
  
-  expect(getConstantPositions(data)).toEqual(expected);
+  expect(utils.getConstantPositions(data)).toEqual(expected);
  });
 
 });
@@ -77,7 +65,7 @@ describe('assigns keys to the values',() => {
    drive: param2[param2.length-1]
   });
 
-  expect(toMap(param1,param2)).toEqual(expected);
+  expect(utils.toMap(param1,param2)).toEqual(expected);
 
  });
 
@@ -87,7 +75,7 @@ describe('enumerates data' , ()=> {
  test('returns object with assigned x and y keys', () => {
   let actual = [ [23],[56] ];
   let expected = { x:actual[0], y:actual[1] };
-  expect(toEnumerate(actual)).toEqual(expected);
+  expect(utils.toEnumerate(actual)).toEqual(expected);
  });
 
 });

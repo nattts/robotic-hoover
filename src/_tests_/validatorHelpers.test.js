@@ -1,12 +1,4 @@
-const { 
- spacesChecker,
- separatedBy1Space,
- hasOnlyLetters,
- removeLast,
- hasSpecificLetters,
- regexChecker
-} = require('../utils/validatorHelpers');
-
+const { checkers } = require('../utils/validatorHelpers');
 
 describe('checks if input has any leading, trailing or between lines spacing',() => {
  test('fails', () => {
@@ -14,13 +6,13 @@ describe('checks if input has any leading, trailing or between lines spacing',()
   let expected = 'no spaces around the input \
    or in between pair of numbers';
   expect(() => {
-   spacesChecker(actual).toThrowError(expected);
+   checkers.spacesChecker(actual).toThrowError(expected);
   });
  });
 
  test('passes', () => {
   let actual = ['2 3', '4 10', '5 5'];
-  expect(spacesChecker(actual)).toBeTruthy();
+  expect(checkers.spacesChecker(actual)).toBeTruthy();
  });
 
 });
@@ -30,7 +22,7 @@ describe('returns array exluding last element', () => {
  test('returns array exluding last element',() => {
   let actual = ['2 3', '4 10', '5 5', 'nnnwwweees'];
   let expected = ['2 3', '4 10', '5 5'];
-  expect(removeLast(actual)).toEqual(expected);
+  expect(checkers.removeLast(actual)).toEqual(expected);
  });
 
 });
@@ -40,14 +32,14 @@ describe('checks data against a pattern. returns true or false', () => {
  test('returns true if regexp pattern match the value',() => {
   let value = '4 7';
   let reg = /^[0-9]+\s[0-9]+$/;
-  expect(regexChecker(value, reg)).toBeTruthy();
+  expect(checkers.regexChecker(value, reg)).toBeTruthy();
 
  });
 
  test('returns false if regexp pattern does not match the value',() => {
   let value = 'ab';
   let reg = /^[0-9]+\s[0-9]+$/;
-  expect(regexChecker(value, reg)).not.toBeTruthy();
+  expect(checkers.regexChecker(value, reg)).not.toBeTruthy();
  });
 
 });
@@ -56,7 +48,7 @@ describe('checks if only 1 spase between numbers',() => {
 
  test('passes',() => {
   let actual = ['2 4', '4 10', '5 5', 'nnnwwweees'];
-  expect(separatedBy1Space(actual)).toBeTruthy();
+  expect(checkers.separatedBy1Space(actual)).toBeTruthy();
 
  });
 
@@ -65,7 +57,7 @@ describe('checks if only 1 spase between numbers',() => {
   let expected = 'values should numbers\
  and separated with a single space.';
   expect(() => {
-   expect(separatedBy1Space(actual)).toThrowError(expected);
+   expect(checkers.separatedBy1Space(actual)).toThrowError(expected);
   });
  });
 
@@ -76,14 +68,14 @@ describe('checks if last line of the input consists of any number of \
 
  test('passes',() => {
   let actual = ['2 3', '4 10', '5 5', 'NWWWSSE'];
-  expect(hasSpecificLetters(actual)).toBeTruthy();
+  expect(checkers.hasSpecificLetters(actual)).toBeTruthy();
  });
 
  test('fails',() => {
   let actual = ['a  b', '4 10', '5 5', 'ABCDEFJKLDJ'];
   let expected = 'last line should only have these letters: NWSE';
   expect(() => {
-   expect(hasSpecificLetters(actual)).toThrowError(expected);
+   expect(checkers.hasSpecificLetters(actual)).toThrowError(expected);
   });
  });
 
@@ -96,7 +88,7 @@ describe('checks if last line contains upper case letters only',() => {
   let actual = ['2 3', '4 10', '5 5', 'abdc'];
   let expected = 'last line should only have uppercase letters';
   expect(() => {
-   expect(hasOnlyLetters(actual)).toThrowError(expected);
+   expect(checkers.hasOnlyLetters(actual)).toThrowError(expected);
 
   });
  });
@@ -106,7 +98,7 @@ describe('checks if last line contains upper case letters only',() => {
   let actual = ['2 3', '4 10', '5 5', '22'];
   let expected = 'last line should only have uppercase letters';
   expect(() => {
-   expect(hasOnlyLetters(actual)).toThrowError(expected);
+   expect(checkers.hasOnlyLetters(actual)).toThrowError(expected);
   });
  });
 
@@ -114,13 +106,13 @@ describe('checks if last line contains upper case letters only',() => {
   let actual = ['2 3', '4 10', '5 5', 'ABcd'];
   let expected = 'last line should only have uppercase letters';
   expect(() => {
-   expect(hasOnlyLetters(actual)).toThrowError(expected);
+   expect(checkers.hasOnlyLetters(actual)).toThrowError(expected);
   });
  });
 
  test('should pass as the last line is not a upper case string ', () =>{
   let actual = ['2 3', '4 10', '5 5', 'ABCDFFFFFFFF'];
-  expect(hasOnlyLetters(actual)).toBeTruthy();
+  expect(checkers.hasOnlyLetters(actual)).toBeTruthy();
  });
 
 });

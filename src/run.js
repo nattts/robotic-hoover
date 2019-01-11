@@ -1,5 +1,4 @@
-import * as base from './base'
-
+const { base } = require('./base');
 const { validator } = require('./validator/inputValidator');
 const { store } = require('./store');
 
@@ -26,7 +25,7 @@ const render = async(coords) => {
 
 base.getData('input.txt', base.fileReader)
  
- .then(base.validator)
+ .then(validator)
  .then(base.inputProcessor)
  .then((result)=> render(result))
  .catch((e) => console.log(new Error(e))); 

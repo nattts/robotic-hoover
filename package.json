@@ -4,12 +4,11 @@
   "main": "main.js",
   "license": "MIT",
   "scripts": {
-    "start": "node main.js",
+    "start": "node src/run.js",
     "test": "jest",
     "watch": "jest --watch *.js"
   },
   "dependencies": {
-    "esm": "^3.0.84",
     "immutable": "^4.0.0-rc.12",
     "jest": "^23.6.0"
   }
