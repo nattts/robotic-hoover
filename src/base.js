@@ -34,7 +34,6 @@ const base = {
    return objectMapper(parsed);
   }
   catch(e) { throw new Error('error with processor');} 
-
  },
 
  /**
@@ -48,34 +47,35 @@ const base = {
 * @const {reverseboard} to make starting point of x:0, y:0 be in the bottom left corner
 */
 
- show: async coords => {
+
+ show: coords => {
   try{
    //clearing the console
    console.log('\x1Bc');
-   const matrix = await utils.createMatrix(coords.room.x,coords.room.y);
-   const spots = await utils.spotGenerator(matrix,coords,utils.placeElement);
-   const board = await utils.placeElement(matrix,'hoover',coords);
+   const matrix = utils.createMatrix(coords.room.x,coords.room.y);
+   const spots = utils.spotGenerator(matrix,coords,utils.placeElement);
+   const board = utils.placeElement(matrix,'hoover',coords);
 
-   if (await utils.isOverlap(coords)) {
-    const spotsLeft = await utils.cleanSpot(coords);
+   if (utils.isOverlap(coords)) {
+    const spotsLeft = utils.cleanSpot(coords);
     coords.spots = [...spotsLeft];
     store.setRemovedSpots();
    }
 
    console.log(board.reverse());
 
-   if (await utils.isAnySpotLeft(coords.spots)) {
-    return await utils.stop(store, coords, utils.stopInterval); 
+   if (utils.isAnySpotLeft(coords.spots)) {
+    return utils.stop(store, coords, utils.stopInterval); 
    }
     
-   if(await utils.isAnyDirectionLeft(coords.drive)) {
-    return await utils.stop(store, coords, utils.stopInterval); 
+   if(utils.isAnyDirectionLeft(coords.drive)) {
+    return utils.stop(store, coords, utils.stopInterval); 
    }
    
-   const nextStep = await utils.nextMove(coords);
+   const nextStep = utils.nextMove(coords);
    const mutable = nextStep.toJS();
 
-   if(await utils.isOutOfBound(mutable)){
+   if(utils.isOutOfBound(mutable)){
     coords.drive = [...mutable.drive];
     return coords;
    }

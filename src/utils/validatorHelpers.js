@@ -12,7 +12,7 @@ function Checkers(){
   return regex.test(value);
  };
 
- this.spacesChecker = function(data)  {
+ this.spacesChecker = data => {
   if(data.includes('')) {
    throw new Error('no leading, trailing or between lines spacing alowed');
   }

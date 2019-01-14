@@ -3,7 +3,7 @@ const { fromJS } = require('immutable');
 
 const utils = {
 
- createMatrix: async (row,col) => [...Array(row)].map(row => Array(col).fill([])),
+ createMatrix:(row,col) => [...Array(row)].map(row => Array(col).fill([])),
 
  getSpotPositions: data => data.slice(2, data.length-1),
 
@@ -17,7 +17,7 @@ const utils = {
  },
 
  //maps values to the keys
- toMap : (spotspos,constants) => ({
+ toMap: (spotspos,constants) => ({
   room:constants[0],
   hoover:constants[1],
   spots:spotspos,
@@ -27,23 +27,18 @@ const utils = {
  //enumerates data with x and y keys 
  toEnumerate: element => ( {x:element[0],y:element[1]} ),
 
- stopInterval: async (intrvl,coords,removedSpots) => {
-  await clearInterval(intrvl);
+ stopInterval: (intrvl,coords,removedSpots) => {
+  clearInterval(intrvl);
   console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
   console.log(`spots cleaned: ${removedSpots}`);
   return coords;
 
  },
 
- isAnyDirectionLeft: async coords => {
-  try{
-   return coords.length === 0;
-  }
-  catch(e){ throw new Error('error in any direction left', e);}
- },
+ isAnyDirectionLeft: coords => coords.length === 0,
 
- stop: async(store, coords, callback) => 
-  await callback(store.getInterval(),coords,store.getRemovedSpots()),
+ stop:(store, coords, callback) =>
+  callback(store.getInterval(),coords,store.getRemovedSpots()),
 
 
  /**
@@ -67,46 +62,28 @@ const utils = {
 * with directions
 */
 
- nextMove: async coords => {
+ nextMove: coords => {
   try{
-
    const nextStep = coords.drive[0](coords.hoover);
-
    const immutableCoords = fromJS(coords);
-
    const nxt = fromJS(nextStep);
-
    const drive = immutableCoords.get('drive').shift();
-
    const filtered = drive.filter((x)=> x != undefined);
- 
    return Object.assign(immutableCoords
     .set('hoover',nxt)
     .set('drive', filtered));
- 
   }
   catch(e){ throw new Error('error in next move', e);}
  },
 
 
- isAnySpotLeft: async coords => {
-  try{
-   return coords.length === 0;
-  }
-  catch(e){ throw new Error('error in any spot left', e);}
- },
+ isAnySpotLeft: coords => coords.length === 0,
 
- isOverlap: async coords => {
-  try{
-   return coords.spots.some((x) => {
-    return JSON.stringify(coords.hoover) === JSON.stringify(x);
-   });
-  }
-  catch(e){ throw new Error('error in overlaping', e);}
- },
+ isOverlap: coords => coords.spots.some((x) => 
+  JSON.stringify(coords.hoover) === JSON.stringify(x)
+ ),
 
-
- placeElement: async (grid,element,coords) => {
+ placeElement: (grid,element,coords) => {
   try{
    if(element === 'hoover'){
     const {x,y} = {x:coords.hoover.x, y:coords.hoover.y}; 
@@ -122,23 +99,18 @@ const utils = {
   catch(e) {throw new Error('error placing element', e);}
  },
 
- spotGenerator: async (board,c,fn) => {
+ spotGenerator: (board,c,fn) => {
   try{
    const coords = [...c.spots];
    if(!coords){ throw new Error('missing coordinates');}
-   return coords.map(async coord => await fn(board,'spot',coord));
+   return coords.map( coord => fn(board,'spot',coord));
   }
   catch(e){ throw new Error('error in spot generator', e);}
  },
 
- findSpotIndex: async (hooverPos,spotsArr) => {
-  try{
-   return spotsArr.findIndex((element) => {
-    return JSON.stringify(element) ===  JSON.stringify(hooverPos);
-   });
-  }
-  catch(e){ throw new Error('err', e);}
- },
+ findSpotIndex: (hooverPos,spotsArr) => 
+  spotsArr.findIndex((element) => 
+   JSON.stringify(element) ===  JSON.stringify(hooverPos)),
 
  /*
 * @function cleanSpot 
@@ -150,19 +122,19 @@ const utils = {
 * if it match hoover position
 */
 
- cleanSpot: async coords => {
-  try{
-   let index = await utils.findSpotIndex(coords.hoover,coords.spots);
-   coords.spots.splice(index,1);
-   return coords.spots;
-  }
-  catch(e){ throw new Error('error in cleaning', e);}
+ cleanSpot: coords => {
+  let index =  utils.findSpotIndex(coords.hoover,coords.spots);
+  coords.spots.splice(index,1);
+  return coords.spots;
  },
 
- isOutOfBound: async coords => {
+ isOutOfBound: coords => {
   const { x:roomX, y:roomY } = coords.room;
   const { x:hooverX, y: hooverY} = coords.hoover;
-  if(hooverY > roomY-1 || hooverX > roomX-1 || hooverX < 0 || hooverY < 0 ){ 
+  if(hooverY > roomY-1 ||
+     hooverX > roomX-1 || 
+     hooverX < 0 ||
+     hooverY < 0 ) { 
    return true;
   }
  }

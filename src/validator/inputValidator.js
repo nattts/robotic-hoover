@@ -4,7 +4,7 @@ const { removeNewLines } = require('../utils/parserHelpers');
 
 const validator = async data => {
  try{
-  let cleanLines = removeNewLines(data);
+  const cleanLines = removeNewLines(data);
   checkers.spacesChecker(cleanLines);
   checkers.separatedBy1Space(cleanLines);
   checkers.hasOnlyLetters(cleanLines);

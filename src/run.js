@@ -11,13 +11,11 @@ const { store } = require('./store');
 *
 */
 
-const render = async(coords) => {
-
- const interval = setInterval(async()=> {
-  const result = await base.show(coords);
+const render = coords => {
+ const interval = setInterval(()=> {
+  const result = base.show(coords);
   coords = {...result};
-
- }, 800);
+ }, 500);
  
  store.setInterval(interval);
 
@@ -35,5 +33,5 @@ const run = async () => {
 }
 
 
-module.exports = { store, run };
+module.exports = { store,run };
 
