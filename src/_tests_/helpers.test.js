@@ -1,7 +1,7 @@
 const { utils } = require('../utils/helpers');
 
 
-describe('creates a grid', () => {
+describe('createMatrix', () => {
  test('creates a grid', () => {
   let row = 3;
   let col = 3;
@@ -81,9 +81,119 @@ describe('enumerates data' , ()=> {
 });
 
 
+describe('checks if any directions left in array' , ()=> {
+ test('returns false if the array length > 0', () => {
+  let actual = utils.isAnyDirectionLeft(['N','S']);
+  expect(actual).toBeFalsy();
+ });
+
+ test('returns true if the array length < 0', () => {
+  let actual = utils.isAnyDirectionLeft([]);
+  expect(actual).toBeTruthy();
+ });
+
+});
+
+describe('checks if any spots left in array' , ()=> {
+ test('returns false if the array length > 0', () => {
+  let actual = utils.isAnySpotLeft([{x:1, y:2}]);
+  expect(actual).toBeFalsy();
+ });
+
+ test('returns true if the array length < 0', () => {
+  let actual = utils.isAnySpotLeft([]);
+  expect(actual).toBeTruthy();
+ });
+
+});
+
+describe('checks if hoover overlap the spot' , ()=> {
+ test('return true if hoover and spot objects are equal', () => {
+  let actual = {};
+  actual.spots = [ {x:1, y:2}, {x:4, y:3}  ];
+  actual.hoover = { x:1, y:2};
+  expect(utils.isOverlap(actual)).toBeTruthy();
+ });
+
+});
+
+describe('placeHoover' , ()=> {
+ test('insert an element on the grid.returns a nested array with an element \
+  placed on the grid', () => {
+  let grid = [ 
+   [ [], [], [] ], 
+   [ [], [], [] ], 
+   [ [], [], [] ] 
+  ];
+  
+  let coords = { x:1, y:2};
+  grid[coords.y][coords.x] = 11;
+  
+  let expected = [ 
+   [ [], [], [] ], 
+   [ [], [], [] ], 
+   [ [], 11, [] ] 
+  ];
+
+  expect(utils.placeHoover(grid,coords)).toEqual(expected);
+ });
+
+});
+
+describe('spotGenerator' , ()=> {
+ test('checks if a callback was called', () => {
+
+  let mock = jest.fn();
+ 
+  let grid = [ 
+   [ [], [], [] ], 
+   [ [], [], [] ], 
+   [ [], [], [] ] 
+  ];
+  let coords = [ {x:1, y:2} ];
+  
+  expect(()=>{
+   utils.spotGenerator(grid,coords,mock);
+   expect(mock).toBeCalled();
+  });
+ 
+ });
+
+});
 
 
+describe('stop' , ()=> {
+ test('checks if callbacks are called', () => {
+  let mockArg = jest.fn();
+  let mockCallback = jest.fn();
+  
+  expect(()=>{
+   utils.stop(mockArg,mockCallback);
+   expect(mockCallback).toBeCalled();
+  });
+
+  expect(()=>{
+   utils.stop(mockArg,mockCallback);
+   expect(mockArg).toBeCalled();
+  });
+
+ });
+
+});
 
 
+describe('cleanSpot' ,() => {
+ test('checks if a callback is called', () => {
+  let mockCoordsArg = jest.fn();
+  let mockCallback = jest.fn();
+
+  expect(()=>{
+   utils.cleanSpot(mockCoordsArg,mockCallback);
+   expect(mockCallback).toBeCalled();
+  });
+
+ });
+
+});
 
 

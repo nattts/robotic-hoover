@@ -53,11 +53,13 @@ const base = {
    //clearing the console
    console.log('\x1Bc');
    const matrix = utils.createMatrix(coords.room.x,coords.room.y);
-   const spots = utils.spotGenerator(matrix,coords,utils.placeElement);
-   const board = utils.placeElement(matrix,'hoover',coords);
+   
+   const spots = utils.spotGenerator(matrix,coords,utils.placeSpot);
+   
+   const board = utils.placeHoover(matrix,coords.hoover);
 
    if (utils.isOverlap(coords)) {
-    const spotsLeft = utils.cleanSpot(coords);
+    const spotsLeft = utils.cleanSpot(coords, utils.findSpotIndex);
     coords.spots = [...spotsLeft];
     store.setRemovedSpots();
    }
@@ -65,11 +67,13 @@ const base = {
    console.log(board.reverse());
 
    if (utils.isAnySpotLeft(coords.spots)) {
-    return utils.stop(store, coords, utils.stopInterval); 
+    utils.stop(store, utils.stopInterval); 
+    return utils.report(coords, store);
    }
     
    if(utils.isAnyDirectionLeft(coords.drive)) {
-    return utils.stop(store, coords, utils.stopInterval); 
+    utils.stop(store, utils.stopInterval); 
+    return utils.report(coords, store); 
    }
    
    const nextStep = utils.nextMove(coords);

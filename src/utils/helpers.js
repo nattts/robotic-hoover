@@ -27,18 +27,34 @@ const utils = {
  //enumerates data with x and y keys 
  toEnumerate: element => ( {x:element[0],y:element[1]} ),
 
- stopInterval: (intrvl,coords,removedSpots) => {
-  clearInterval(intrvl);
-  console.log(`hoover position:  ${coords.hoover.x} ${coords.hoover.y}`);
-  console.log(`spots cleaned: ${removedSpots}`);
-  return coords;
-
+ report: (coords,store) => {
+  const info = `hoover position:  ${coords.hoover.x} ${coords.hoover.y}
+  spots cleaned: ${store.getRemovedSpots()} `;
+  return console.log(info);
  },
 
- isAnyDirectionLeft: coords => coords.length === 0,
+ stopInterval: intrvl => clearInterval(intrvl),
 
- stop:(store, coords, callback) =>
-  callback(store.getInterval(),coords,store.getRemovedSpots()),
+ stop:(store,callback) => callback(store.getInterval()),
+
+ isAnyDirectionLeft: driveCoordsArray => driveCoordsArray.length === 0,
+
+ isAnySpotLeft: spotCoordsArray => spotCoordsArray.length === 0,
+
+ isOverlap: coords => coords.spots.some((x) => 
+  JSON.stringify(coords.hoover) === JSON.stringify(x)
+ ),
+
+ isOutOfBound: coords => {
+  const { x:roomX, y:roomY } = coords.room;
+  const { x:hooverX, y: hooverY} = coords.hoover;
+  if(hooverY > roomY-1 ||
+     hooverX > roomX-1 || 
+     hooverX < 0 ||
+     hooverY < 0 ) { 
+   return true;
+  }
+ },
 
 
  /**
@@ -77,36 +93,25 @@ const utils = {
  },
 
 
- isAnySpotLeft: coords => coords.length === 0,
-
- isOverlap: coords => coords.spots.some((x) => 
-  JSON.stringify(coords.hoover) === JSON.stringify(x)
- ),
-
- placeElement: (grid,element,coords) => {
-  try{
-   if(element === 'hoover'){
-    const {x,y} = {x:coords.hoover.x, y:coords.hoover.y}; 
-    grid[y][x] = 11;
-    return grid;
-   }
-   if(element === 'spot'){
-    const {x,y} = {x:coords.x, y:coords.y};
-    grid[y][x] = 33;
-    return grid;
-   }
-  }
-  catch(e) {throw new Error('error placing element', e);}
+ placeHoover:(grid, hoover) => {
+  grid[hoover.y][hoover.x] = 11;
+  return grid;
  },
 
- spotGenerator: (board,c,fn) => {
+ placeSpot: (grid, spot) => {
+  grid[spot.y][spot.x] = 33;
+  return grid;
+ },
+
+ spotGenerator: (grid,coords,callback) => {
   try{
-   const coords = [...c.spots];
-   if(!coords){ throw new Error('missing coordinates');}
-   return coords.map( coord => fn(board,'spot',coord));
+   const coordsArray = [...coords.spots];
+   if(!coordsArray){ throw new Error('missing coordinates');}
+   return coordsArray.map( coord => callback(grid,coord));
   }
   catch(e){ throw new Error('error in spot generator', e);}
  },
+
 
  findSpotIndex: (hooverPos,spotsArr) => 
   spotsArr.findIndex((element) => 
@@ -114,30 +119,20 @@ const utils = {
 
  /*
 * @function cleanSpot 
-* @param {object} coords 
-* @param {coords.spots} Array of objects
-* @param {coords.hoover} Object
+* @argument {object} coords 
+* @argument {coords.spots} Array of objects
+* @argument {coords.hoover} Object
 *
 * removes spot by deleting an object of spot position 
 * if it match hoover position
 */
 
- cleanSpot: coords => {
-  let index =  utils.findSpotIndex(coords.hoover,coords.spots);
+ cleanSpot: (coords, callback) => {
+  let index = callback(coords.hoover,coords.spots);
   coords.spots.splice(index,1);
   return coords.spots;
- },
-
- isOutOfBound: coords => {
-  const { x:roomX, y:roomY } = coords.room;
-  const { x:hooverX, y: hooverY} = coords.hoover;
-  if(hooverY > roomY-1 ||
-     hooverX > roomX-1 || 
-     hooverX < 0 ||
-     hooverY < 0 ) { 
-   return true;
-  }
  }
+
 
 };
 
